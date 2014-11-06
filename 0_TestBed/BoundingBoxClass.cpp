@@ -116,3 +116,17 @@ void BoundingBoxClass::Release(void)
 	// No longer point to the model manager singleton
 	m_pModelMngr = nullptr;
 }
+
+// Accessors
+vector3 BoundingBoxClass::GetCentroidOBB(void) { return m_v3CentroidOBB; }
+vector3 BoundingBoxClass::GetCentroidAABB(void) { return m_v3CentroidAABB; }
+
+vector3 BoundingBoxClass::GetColorOBB(void) { return m_v3ColorOBB; }
+void BoundingBoxClass::SetColorOBB(vector3 a_v3Color) { m_v3ColorOBB = a_v3Color; }
+
+vector3 BoundingBoxClass::GetColorAABB(void) { return m_v3ColorAABB; }
+void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color; }
+
+matrix4 BoundingBoxClass::GetModelMatrixOBB(void) { return m_m4ModelToWorldOBB; }
+
+matrix4 BoundingBoxClass::GetModelMatrixAABB(void) { return m_m4ModelToWorldAABB; }

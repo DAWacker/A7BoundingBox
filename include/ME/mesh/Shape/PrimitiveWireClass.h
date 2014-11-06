@@ -30,7 +30,6 @@ public:
 	void GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisions, vector3 a_vColor);
 	void GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fHeight, int a_nSubdivisions, vector3 a_vColor);
 	void GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_vColor);
-	void GenerateRectangle(vector3 a_v3Min, vector3 a_v3Max, vector3 a_vColor);
 	
 	//Renders the content of the shape
 	virtual void Render(GLenum mode = GL_TRIANGLES);

@@ -11,16 +11,12 @@ class BoundingBoxClass
 	vector3 m_v3CentroidOBB;			// Centroid of the OBB
 	vector3 m_v3ColorOBB;				// Color of the OBB
 	matrix4 m_m4ModelToWorldOBB;		// Model matrix of the OBB
-	vector3 m_v3MinOBB;					// Min vertex of the OBB
-	vector3 m_v3MaxOBB;					// Max vertex of the OBB
 	PrimitiveWireClass* m_pMeshOBB;		// Mesh for OBB
 
 	bool m_bVisibleAABB;				// Flag for rendering the AABB or not
 	vector3 m_v3CentroidAABB;			// Centroid of the AABB
 	vector3 m_v3ColorAABB;				// Color of the AABB
 	matrix4 m_m4ModelToWorldAABB;		// Model matrix of the AABB
-	vector3 m_v3MinAABB;				// Min vertex of the AABB
-	vector3 m_v3MaxAABB;				// Max vertex of the AABB
 	PrimitiveWireClass* m_pMeshAABB;	// Mesh for AABB
 
 public:
@@ -50,18 +46,16 @@ public:
 	__declspec(property(get = GetColorOBB, put = SetColorOBB)) vector3 ColorOBB;
 
 	vector3 GetMaxOBB(void);
-	void SetMaxOBB(vector3 a_v3Max);
-	__declspec(property(get = GetMaxOBB, put = SetMaxOBB)) vector3 MaxOBB;
+	__declspec(property(get = GetMaxOBB)) vector3 MaxOBB;
 
 	vector3 GetMinOBB(void);
-	void SetMinOBB(vector3 a_v3Min);
-	__declspec(property(get = GetMinOBB, put = SetMinOBB)) vector3 MinOBB;
+	__declspec(property(get = GetMinOBB)) vector3 MinOBB;
 
 	void RenderOBB(vector3 a_v3Color = MEDEFAULT);
 
 	/* Helper methods for the AABB */
 	bool GetVisibleAABB(void);
-	bool SetVisibleAABB(bool a_bVisible);
+	void SetVisibleAABB(bool a_bVisible);
 	__declspec(property(get = GetVisibleAABB, put = SetVisibleAABB)) bool VisibleAABB;
 
 	vector3 GetCentroidAABB(void);
@@ -87,7 +81,4 @@ public:
 
 private:
 	void Release(void);
-
-	void CalculateOBB(String a_sInstance);
-	void CalculateAABB(String a_sInstance);
 };

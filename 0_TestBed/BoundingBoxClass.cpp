@@ -6,16 +6,12 @@ BoundingBoxClass::BoundingBoxClass(String a_sInstanceName)
 	m_v3CentroidOBB = vector3(0.0f, 0.0f, 0.0f);
 	m_v3ColorOBB = MEWHITE;
 	m_m4ModelToWorldOBB = matrix4(1.0f);
-	m_v3MinOBB = vector3(-0.5f, -0.5f, -0.5f);
-	m_v3MaxOBB = vector3(0.5f, 0.5f, 0.5f);
 	m_bVisibleOBB = false;
 
 	m_pMeshAABB = nullptr;
 	m_v3CentroidAABB = vector3(0.0f, 0.0f, 0.0f);
 	m_v3ColorAABB = MEWHITE;
 	m_m4ModelToWorldAABB = matrix4(1.0f);
-	m_v3MinAABB = vector3(-0.5f, -0.5f, -0.5f);
-	m_v3MaxAABB = vector3(0.5f, 0.5f, 0.5f);
 	m_bVisibleAABB = false;
 
 	m_pModelMngr = ModelManagerClass::GetInstance();
@@ -24,9 +20,6 @@ BoundingBoxClass::BoundingBoxClass(String a_sInstanceName)
 	int nInstance = m_pModelMngr->IdentifyInstance(m_sInstance);
 	if (nInstance == -1)
 		return;
-
-	CalculateOBB(m_sInstance);
-	CalculateAABB(m_sInstance);
 
 	m_pMeshOBB = new PrimitiveWireClass();
 	m_pMeshOBB->GenerateCube(1.0f, MEWHITE);
@@ -45,16 +38,13 @@ BoundingBoxClass::BoundingBoxClass(BoundingBoxClass const& other)
 	m_bVisibleOBB = other.m_bVisibleOBB;
 	m_v3CentroidOBB = other.m_v3CentroidOBB;
 	m_m4ModelToWorldOBB = other.m_m4ModelToWorldOBB;
-	m_v3MinOBB = other.m_v3MinOBB;
-	m_v3MaxOBB = other.m_v3MaxOBB;
 
 	m_bVisibleAABB = other.m_bVisibleAABB;
 	m_v3CentroidAABB = other.m_v3CentroidAABB;
 	m_m4ModelToWorldAABB = other.m_m4ModelToWorldAABB;
-	m_v3MinAABB = other.m_v3MinAABB;
 
 	m_pMeshOBB = new PrimitiveWireClass();
-	m_pMeshOBB->GenerateCube(1.0f, MEWHITE);
+	m_pMeshOBB->GenerateCube(1.0f, MEBLUE);
 	m_pMeshOBB->SetModelMatrix(glm::translate(m_m4ModelToWorldOBB, m_v3CentroidOBB));
 
 	m_pMeshAABB = new PrimitiveWireClass();
@@ -72,16 +62,13 @@ BoundingBoxClass& BoundingBoxClass::operator=(BoundingBoxClass const& other)
 		m_bVisibleOBB = other.m_bVisibleOBB;
 		m_v3CentroidOBB = other.m_v3CentroidOBB;
 		m_m4ModelToWorldOBB = other.m_m4ModelToWorldOBB;
-		m_v3MinOBB = other.m_v3MinOBB;
-		m_v3MaxOBB = other.m_v3MaxOBB;
 
 		m_bVisibleAABB = other.m_bVisibleAABB;
 		m_v3CentroidAABB = other.m_v3CentroidAABB;
 		m_m4ModelToWorldAABB = other.m_m4ModelToWorldAABB;
-		m_v3MinAABB = other.m_v3MinAABB;
 
 		m_pMeshOBB = new PrimitiveWireClass();
-		m_pMeshOBB->GenerateCube(1.0f, MEWHITE);
+		m_pMeshOBB->GenerateCube(1.0f, MEBLUE);
 		m_pMeshOBB->SetModelMatrix(glm::translate(m_m4ModelToWorldOBB, m_v3CentroidOBB));
 
 		m_pMeshAABB = new PrimitiveWireClass();
@@ -118,15 +105,132 @@ void BoundingBoxClass::Release(void)
 }
 
 // Accessors
-vector3 BoundingBoxClass::GetCentroidOBB(void) { return m_v3CentroidOBB; }
-vector3 BoundingBoxClass::GetCentroidAABB(void) { return m_v3CentroidAABB; }
+bool BoundingBoxClass::GetVisibleOBB(void) { return m_bVisibleOBB; }
+void BoundingBoxClass::SetVisibleOBB(bool a_bVisible) { m_bVisibleOBB = a_bVisible; }
+
+bool BoundingBoxClass::GetVisibleAABB(void) { return m_bVisibleAABB; }
+void BoundingBoxClass::SetVisibleAABB(bool a_bVisible) { m_bVisibleAABB = a_bVisible; }
 
 vector3 BoundingBoxClass::GetColorOBB(void) { return m_v3ColorOBB; }
-void BoundingBoxClass::SetColorOBB(vector3 a_v3Color) { m_v3ColorOBB = a_v3Color; }
+void BoundingBoxClass::SetColorOBB(vector3 a_v3Color){ m_v3ColorOBB = a_v3Color == m_v3ColorAABB ? m_v3ColorOBB : a_v3Color; }
 
 vector3 BoundingBoxClass::GetColorAABB(void) { return m_v3ColorAABB; }
-void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color; }
+void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color == m_v3ColorOBB ? m_v3ColorAABB : a_v3Color; }
 
 matrix4 BoundingBoxClass::GetModelMatrixOBB(void) { return m_m4ModelToWorldOBB; }
+void BoundingBoxClass::SetModelMatrixOBB(matrix4 a_m4Matrix) { m_m4ModelToWorldOBB = a_m4Matrix; }
 
 matrix4 BoundingBoxClass::GetModelMatrixAABB(void) { return m_m4ModelToWorldAABB; }
+void BoundingBoxClass::SetModelMatrixAABB(matrix4 a_m4Matrix) { m_m4ModelToWorldAABB = a_m4Matrix; }
+
+vector3 BoundingBoxClass::GetMaxOBB(void)
+{
+	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
+	int nVertices = static_cast<int>(vVertices.size());
+
+	vector3 v3Maximum;
+	if (nVertices > 0)
+	{
+		v3Maximum = vVertices[0];
+		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		{
+			if (vVertices[nVertex].x > v3Maximum.x)
+				v3Maximum.x = vVertices[nVertex].x;
+
+			if (vVertices[nVertex].y > v3Maximum.y)
+				v3Maximum.y = vVertices[nVertex].y;
+
+			if (vVertices[nVertex].z > v3Maximum.z)
+				v3Maximum.z = vVertices[nVertex].z;
+		}
+	}
+
+	return v3Maximum;
+}
+
+vector3 BoundingBoxClass::GetMinOBB(void)
+{
+	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
+	int nVertices = static_cast<int>(vVertices.size());
+
+	vector3 v3Minimum;
+	if (nVertices > 0)
+	{
+		v3Minimum = vVertices[0];
+		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		{
+			if (vVertices[nVertex].x < v3Minimum.x)
+				v3Minimum.x = vVertices[nVertex].x;
+
+			if (vVertices[nVertex].y < v3Minimum.y)
+				v3Minimum.y = vVertices[nVertex].y;
+
+			if (vVertices[nVertex].z < v3Minimum.z)
+				v3Minimum.z = vVertices[nVertex].z;
+		}
+	}
+
+	return v3Minimum;
+}
+
+vector3 BoundingBoxClass::GetMaxAABB(void)
+{
+	// To be implemented by Dylan
+	vector3 v3Maximum;
+	return v3Maximum;
+}
+
+vector3 BoundingBoxClass::GetMinAABB(void)
+{
+	// To be implemented by Dylan
+	vector3 v3Minimum;
+	return v3Minimum;
+}
+
+vector3 BoundingBoxClass::GetCentroidOBB(void)
+{
+	vector3 v3Minimum = GetMinOBB();
+	vector3 v3Maximum = GetMaxOBB();
+
+	vector3 v3Centroid = v3Minimum + v3Maximum;
+	v3Centroid /= 2.0f;
+
+	m_v3CentroidOBB = v3Centroid;
+	return m_v3CentroidOBB;
+}
+
+vector3 BoundingBoxClass::GetCentroidAABB(void)
+{
+	vector3 v3Minimum = GetMinAABB();
+	vector3 v3Maximum = GetMaxAABB();
+
+	vector3 v3Centroid = v3Minimum + v3Maximum;
+	v3Centroid /= 2.0f;
+
+	m_v3CentroidAABB = v3Centroid;
+	return m_v3CentroidAABB;
+}
+
+void BoundingBoxClass::RenderOBB(vector3 a_v3Color = MEDEFAULT)
+{
+	if (!m_bVisibleOBB)
+		return;
+
+	vector3 v3Color = a_v3Color == MEDEFAULT ? m_v3ColorOBB : a_v3Color;
+
+	// Not completed, need box manager to test if things are rendering properly
+
+	m_pMeshOBB->Render(matrix4(1.0f), v3Color);
+}
+
+void BoundingBoxClass::RenderAABB(vector3 a_v3Color = MEDEFAULT)
+{
+	if (!m_bVisibleAABB)
+		return;
+
+	vector3 v3Color = a_v3Color == MEDEFAULT ? m_v3ColorAABB : a_v3Color;
+
+	// Not completed, need box manager to test if things are rendering properly
+
+	m_pMeshAABB->Render(matrix4(1.0f), v3Color);
+}

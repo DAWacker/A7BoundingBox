@@ -2,7 +2,7 @@
 void ApplicationClass::Update (void)
 {
 	m_pSystem->UpdateTime(); //Update the system
-	printf("FPS: %d \r", m_pSystem->FPS);//print the Frames per Second
+	//printf("FPS: %d \r", m_pSystem->FPS);//print the Frames per Second
 
 	//Check if the objects models have been read
 	static bool bObjectSelected = false;
@@ -24,7 +24,7 @@ void ApplicationClass::Update (void)
 		CameraRotation();
 
 	m_pBSMngr->Update();
-	//m_pBBMngr->Update();
+	m_pBBMngr->Update();
 }
 
 void ApplicationClass::Display3X (void) //for OpenGL 3.X Applications
@@ -34,7 +34,7 @@ void ApplicationClass::Display3X (void) //for OpenGL 3.X Applications
 	m_pModelManager->RenderInstance();
 
 	m_pBSMngr->Render();
-	//m_pBBMngr->Render();
+	m_pBBMngr->Render();
 
 	m_pGLSystem->GLSwapBuffers();
 }

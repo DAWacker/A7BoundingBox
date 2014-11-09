@@ -52,6 +52,7 @@ public:
 	__declspec(property(get = GetMinOBB)) vector3 MinOBB;
 
 	void RenderOBB(vector3 a_v3Color = MEDEFAULT);
+	void CalculateOBB(String a_sInstance);
 	
 	/* Gets the name of the model associated with this bounding sphere from model manager */
 	String GetInstanceName(void);
@@ -84,6 +85,7 @@ public:
 	__declspec(property(get = GetMinAABB, put = SetMinAABB)) vector3 MinAABB;
 
 	void RenderAABB(vector3 a_v3Color = MEDEFAULT);
+	void CalculateAABB(String a_sInstance);
 
 private:
 	void Release(void);

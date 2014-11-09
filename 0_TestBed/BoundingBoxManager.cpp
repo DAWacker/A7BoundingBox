@@ -138,7 +138,7 @@ void BoundingBoxManager::RemoveBox(String a_sInstanceName)
 	if(a_sInstanceName == "ALL")
 	{
 		//Clear the vector's element first otherwise there is a memory leak
-		for(int nBox = 0; nBox < m_nBoxes; nBox++)
+ 		for(int nBox = 0; nBox < m_nBoxes; nBox++)
 		{
 			BoundingBoxClass* pBS = m_vBoundingBox[nBox];
 			delete pBS;
@@ -176,8 +176,8 @@ void BoundingBoxManager::Update(void)
 		m_vBoundingBox[nBox]->SetColorOBB(MEWHITE);
 		m_vBoundingBox[nBox]->SetColorAABB(MEWHITE);
 	}
-	CollisionCheck();
-	CollisionResponse();
+	//CollisionCheck();
+	//CollisionResponse();
 }
 
 void BoundingBoxManager::CollisionCheck(void)

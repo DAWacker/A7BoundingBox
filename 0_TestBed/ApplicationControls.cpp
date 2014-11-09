@@ -152,7 +152,7 @@ void ApplicationClass::ProcessKeyboard(void)
 			String sInstance = m_pModelManager->GetInstanceName(nInstance);//Create spheres
 			m_pBBMngr->AddBox(sInstance);
 		}
-		m_pBBMngr->SetVisible(true, "ALL");//Make those spheres visible
+		m_pBBMngr->SetVisible(true, "ALL");//Make those boxes visible
 		bWasF6Pressed = false;//reset the flag
 	}
 
@@ -361,7 +361,7 @@ void ApplicationClass::ArcBall(float a_fSensitivity)
 	//m_pCamera0->Rotate(fVerticalAngle, fHorizontalAngle);
 	m_pModelManager->SetModelMatrix(arcball, m_sSelectedObject);
 	m_pBSMngr->SetModelMatrix(arcball, m_sSelectedObject);
-	//m_pBBMngr->SetModelMatrix(arcball, m_sSelectedObject);
+	m_pBBMngr->SetModelMatrix(arcball, m_sSelectedObject);
 	//m_pPrimitive->SetModelMatrix(arcball);
 }
 void ApplicationClass::CameraRotation(float a_fSpeed)

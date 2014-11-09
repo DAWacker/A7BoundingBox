@@ -4,12 +4,12 @@ BoundingBoxClass::BoundingBoxClass(String a_sInstanceName)
 {
 	m_pMeshOBB = nullptr;
 	m_v3CentroidOBB = vector3(0.0f, 0.0f, 0.0f);
-	m_v3ColorOBB = MEWHITE;
+	m_v3ColorOBB = MEBLUE;
 	m_m4ModelToWorldOBB = matrix4(1.0f);
 	m_bVisibleOBB = false;
 
 	m_pMeshAABB = nullptr;
-	m_v3CentroidAABB = vector3(0.0f, 0.0f, 0.0f);
+	m_v3CentroidAABB = vector3(0.0f,0.0f,0.0f);
 	m_v3ColorAABB = MEWHITE;
 	m_m4ModelToWorldAABB = matrix4(1.0f);
 	m_bVisibleAABB = false;
@@ -21,13 +21,19 @@ BoundingBoxClass::BoundingBoxClass(String a_sInstanceName)
 	if (nInstance == -1)
 		return;
 
+	CalculateOBB(m_sInstance);
+	m_m4ModelToWorldOBB = m_pModelMngr->GetModelMatrix(m_sInstance);
+
 	m_pMeshOBB = new PrimitiveWireClass();
-	m_pMeshOBB->GenerateCube(1.0f, MEWHITE);
-	m_pMeshOBB->SetModelMatrix(glm::translate(m_m4ModelToWorldOBB, m_v3CentroidOBB));
+	m_pMeshOBB->GenerateCube(1.0f, MEBLUE);
+	SetModelMatrixOBB(m_m4ModelToWorldOBB);
+
+	CalculateAABB(m_sInstance);
+	m_m4ModelToWorldAABB = m_pModelMngr->GetModelMatrix(m_sInstance);
 
 	m_pMeshAABB = new PrimitiveWireClass();
 	m_pMeshAABB->GenerateCube(1.0f, MEWHITE);
-	m_pMeshAABB->SetModelMatrix(glm::translate(m_m4ModelToWorldAABB, m_v3CentroidAABB));
+	SetModelMatrixAABB(m_m4ModelToWorldAABB);
 }
 
 BoundingBoxClass::BoundingBoxClass(BoundingBoxClass const& other)
@@ -120,21 +126,54 @@ vector3 BoundingBoxClass::GetColorAABB(void) { return m_v3ColorAABB; }
 void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color == m_v3ColorOBB ? m_v3ColorAABB : a_v3Color; }
 
 matrix4 BoundingBoxClass::GetModelMatrixOBB(void) { return m_m4ModelToWorldOBB; }
-void BoundingBoxClass::SetModelMatrixOBB(matrix4 a_m4Matrix) { m_m4ModelToWorldOBB = a_m4Matrix; }
+void BoundingBoxClass::SetModelMatrixOBB(matrix4 a_m4Matrix)
+{ 
+	m_m4ModelToWorldOBB = a_m4Matrix;
+
+	CalculateOBB(m_sInstance);
+
+	matrix4 translate = glm::translate(a_m4Matrix, m_v3CentroidOBB);
+	
+	vector3 v3Min = GetMinOBB();
+	vector3 v3Max = GetMaxOBB();
+	matrix4 scale = glm::scale(v3Max - v3Min);
+
+	matrix4 m4MatrixOBB = translate * scale;
+
+	m_pMeshOBB->SetModelMatrix(m4MatrixOBB);
+}
 
 matrix4 BoundingBoxClass::GetModelMatrixAABB(void) { return m_m4ModelToWorldAABB; }
-void BoundingBoxClass::SetModelMatrixAABB(matrix4 a_m4Matrix) { m_m4ModelToWorldAABB = a_m4Matrix; }
+void BoundingBoxClass::SetModelMatrixAABB(matrix4 a_m4Matrix)
+{ 
+	m_m4ModelToWorldAABB = a_m4Matrix;
+
+	CalculateAABB(m_sInstance);
+
+	matrix4 translate = glm::translate(a_m4Matrix, m_v3CentroidAABB);
+
+	vector3 v3Min = GetMinAABB();
+	vector3 v3Max = GetMaxAABB();
+	matrix4 scale = glm::scale(v3Max - v3Min);
+
+	matrix4 m4MatrixAABB = translate * scale;
+
+	m_pMeshAABB->SetModelMatrix(m4MatrixAABB);
+}
 
 vector3 BoundingBoxClass::GetMaxOBB(void)
 {
+	//Go one by one on each component and realize which one is the largest one
 	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
 	int nVertices = static_cast<int>(vVertices.size());
 
 	vector3 v3Maximum;
 	if (nVertices > 0)
 	{
+		//We assume the first vertex is the largest one
 		v3Maximum = vVertices[0];
-		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		//And iterate one by one
+		for (int nVertex = 1; nVertex < nVertices; nVertex++)
 		{
 			if (vVertices[nVertex].x > v3Maximum.x)
 				v3Maximum.x = vVertices[nVertex].x;
@@ -152,14 +191,17 @@ vector3 BoundingBoxClass::GetMaxOBB(void)
 
 vector3 BoundingBoxClass::GetMinOBB(void)
 {
+	//Go one by one on each component and realize which one is the smallest one
 	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
 	int nVertices = static_cast<int>(vVertices.size());
 
 	vector3 v3Minimum;
 	if (nVertices > 0)
 	{
+		//We assume the first vertex is the smallest one
 		v3Minimum = vVertices[0];
-		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		//And iterate one by one
+		for (int nVertex = 1; nVertex < nVertices; nVertex++)
 		{
 			if (vVertices[nVertex].x < v3Minimum.x)
 				v3Minimum.x = vVertices[nVertex].x;
@@ -173,6 +215,28 @@ vector3 BoundingBoxClass::GetMinOBB(void)
 	}
 
 	return v3Minimum;
+}
+
+void BoundingBoxClass::CalculateOBB(String a_sInstance)
+{
+	vector3 v3Minimum = GetMinOBB();
+	vector3 v3Maximum = GetMaxOBB();
+
+	m_v3CentroidOBB = v3Minimum + v3Maximum;
+	m_v3CentroidOBB /= 2.0f;
+
+	return;
+}
+
+void BoundingBoxClass::CalculateAABB(String a_sIstance)
+{
+	vector3 v3Minimum = GetMinAABB();
+	vector3 v3Maximum = GetMaxAABB();
+
+	m_v3CentroidAABB = v3Minimum + v3Maximum;
+	m_v3CentroidAABB /= 2.0f;
+
+	return;
 }
 
 //Helper function for making local coordinates global
@@ -192,7 +256,7 @@ vector3 BoundingBoxClass::GetMaxAABB(void)
 	if (nVertices > 0)
 	{
 		v3Maximum = LocalToWorld(vVertices[0], m_pModelMngr->GetModelMatrix(m_sInstance));
-		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		for (int nVertex = 1; nVertex < nVertices; nVertex++)
 		{
 			vector3 checking = LocalToWorld(vVertices[nVertex],  m_pModelMngr->GetModelMatrix(m_sInstance));
 			
@@ -212,7 +276,6 @@ vector3 BoundingBoxClass::GetMaxAABB(void)
 
 vector3 BoundingBoxClass::GetMinAABB(void)
 {
-	// To be implemented by Dylan
 	vector3 v3Minimum;
 
 	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
@@ -220,7 +283,7 @@ vector3 BoundingBoxClass::GetMinAABB(void)
 	if (nVertices > 0)
 	{
 		v3Minimum = LocalToWorld(vVertices[0], m_pModelMngr->GetModelMatrix(m_sInstance));
-		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		for (int nVertex = 1; nVertex < nVertices; nVertex++)
 		{
 			vector3 checking = LocalToWorld(vVertices[nVertex],  m_pModelMngr->GetModelMatrix(m_sInstance));
 			
@@ -267,8 +330,6 @@ void BoundingBoxClass::RenderOBB(vector3 a_v3Color)
 		return;
 
 	vector3 v3Color = a_v3Color == MEDEFAULT ? m_v3ColorOBB : a_v3Color;
-
-	// Not completed, need box manager to test if things are rendering properly
 
 	m_pMeshOBB->Render(matrix4(1.0f), v3Color);
 }

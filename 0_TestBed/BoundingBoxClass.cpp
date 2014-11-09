@@ -105,6 +105,8 @@ void BoundingBoxClass::Release(void)
 }
 
 // Accessors
+String BoundingBoxClass::GetInstanceName(void){ return m_sInstance; }
+
 bool BoundingBoxClass::GetVisibleOBB(void) { return m_bVisibleOBB; }
 void BoundingBoxClass::SetVisibleOBB(bool a_bVisible) { m_bVisibleOBB = a_bVisible; }
 
@@ -173,10 +175,38 @@ vector3 BoundingBoxClass::GetMinOBB(void)
 	return v3Minimum;
 }
 
+//Helper function for making local coordinates global
+vector3 LocalToWorld(vector3 vec3, matrix4 mat4World){
+	vector4 vec4(vec3.x, vec3.y, vec3.z, 1);
+	vector4 vec4Translated = mat4World * vec4;
+	vector3 translated(vec4Translated.x, vec4Translated.y, vec4Translated.z);
+	return translated;
+}
+
 vector3 BoundingBoxClass::GetMaxAABB(void)
 {
-	// To be implemented by Dylan
 	vector3 v3Maximum;
+
+	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
+	int nVertices = static_cast<int>(vVertices.size());
+	if (nVertices > 0)
+	{
+		v3Maximum = LocalToWorld(vVertices[0], m_pModelMngr->GetModelMatrix(m_sInstance));
+		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		{
+			vector3 checking = LocalToWorld(vVertices[nVertex],  m_pModelMngr->GetModelMatrix(m_sInstance));
+			
+			if (checking.x > v3Maximum.x)
+				v3Maximum.x = checking.x;
+
+			if (checking.y > v3Maximum.y)
+				v3Maximum.y = checking.y;
+
+			if (checking.z > v3Maximum.z)
+				v3Maximum.z = checking.z;
+		}
+	}
+
 	return v3Maximum;
 }
 
@@ -184,6 +214,26 @@ vector3 BoundingBoxClass::GetMinAABB(void)
 {
 	// To be implemented by Dylan
 	vector3 v3Minimum;
+
+	std::vector<vector3> vVertices = m_pModelMngr->GetVertices(m_sInstance);
+	int nVertices = static_cast<int>(vVertices.size());
+	if (nVertices > 0)
+	{
+		v3Minimum = LocalToWorld(vVertices[0], m_pModelMngr->GetModelMatrix(m_sInstance));
+		for (int nVertex = 1; nVertex < nVertex; nVertex++)
+		{
+			vector3 checking = LocalToWorld(vVertices[nVertex],  m_pModelMngr->GetModelMatrix(m_sInstance));
+			
+			if (checking.x < v3Minimum.x)
+				v3Minimum.x = checking.x;
+
+			if (checking.y < v3Minimum.y)
+				v3Minimum.y = checking.y;
+
+			if (checking.z < v3Minimum.z)
+				v3Minimum.z = checking.z;
+		}
+	}
 	return v3Minimum;
 }
 
@@ -211,7 +261,7 @@ vector3 BoundingBoxClass::GetCentroidAABB(void)
 	return m_v3CentroidAABB;
 }
 
-void BoundingBoxClass::RenderOBB(vector3 a_v3Color = MEDEFAULT)
+void BoundingBoxClass::RenderOBB(vector3 a_v3Color)
 {
 	if (!m_bVisibleOBB)
 		return;
@@ -223,7 +273,7 @@ void BoundingBoxClass::RenderOBB(vector3 a_v3Color = MEDEFAULT)
 	m_pMeshOBB->Render(matrix4(1.0f), v3Color);
 }
 
-void BoundingBoxClass::RenderAABB(vector3 a_v3Color = MEDEFAULT)
+void BoundingBoxClass::RenderAABB(vector3 a_v3Color)
 {
 	if (!m_bVisibleAABB)
 		return;

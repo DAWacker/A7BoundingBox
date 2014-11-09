@@ -186,32 +186,19 @@ void BoundingBoxManager::CollisionCheck(void)
 	//AABB
 	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
 	{
+		vector3 currentMax = m_vBoundingBox[nBox2]->GetMaxAABB();
+		vector3 currentMin = m_vBoundingBox[nBox2]->GetMinAABB();
 		for(int nBox1 = 0; nBox1 < m_nBoxes; nBox1++)
 		{
+			vector3 checkingMax = m_vBoundingBox[nBox1]->GetMaxAABB();
+			vector3 checkingMin = m_vBoundingBox[nBox1]->GetMinAABB();
 			if(nBox1 != nBox2)
 			{
-				//Get Radius of Box1
-				float fRadius1 = m_vBoundingBox[nBox1]->GetRadius();
-				
-				//Get Radius of Box2
-				float fRadius2 = m_vBoundingBox[nBox2]->GetRadius();
-				
-				//Get origin of Box1
-				matrix4 mMatrix1 = m_vBoundingBox[nBox1]->GetModelMatrix();
-				vector3 vCentroid1 = m_vBoundingBox[nBox1]->GetCentroid();
-				vector3 fOrigin1 = static_cast<vector3>(glm::translate(mMatrix1, vCentroid1) * vector4(0.0f, 0.0f, 0.0f, 1.0f));
-				
-				//Get origin of Box2
-				matrix4 mMatrix2 = m_vBoundingBox[nBox2]->GetModelMatrix();
-				vector3 vCentroid2 = m_vBoundingBox[nBox2]->GetCentroid();
-				vector3 fOrigin2 = static_cast<vector3>(glm::translate(mMatrix2, vCentroid2) * vector4(0.0f, 0.0f, 0.0f, 1.0f));
-				
-				float fDistance = glm::distance(fOrigin1,fOrigin2);
-				float fRadiusSum = fRadius1 + fRadius2;
-				if(fDistance < fRadiusSum)
-				{
-					m_vCollidingNames.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
-					m_vCollidingNames.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
+				if(checkingMin.x > currentMin.x || checkingMax.x < currentMax.x){
+					if(checkingMin.y > currentMin.y || checkingMax.y < checkingMin.y){
+						if(checkingMin.z > currentMin.z || checkingMax.z < checkingMax.z)
+							m_vCollidingNamesAABB.push_back(m_vBoundingBox[m_nBoxes]->GetInstanceName());
+					}
 				}
 			}
 		}

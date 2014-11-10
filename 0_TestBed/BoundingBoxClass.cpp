@@ -123,7 +123,8 @@ vector3 BoundingBoxClass::GetColorOBB(void) { return m_v3ColorOBB; }
 void BoundingBoxClass::SetColorOBB(vector3 a_v3Color){ m_v3ColorOBB = a_v3Color == m_v3ColorAABB ? m_v3ColorOBB : a_v3Color; }
 
 vector3 BoundingBoxClass::GetColorAABB(void) { return m_v3ColorAABB; }
-void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color == m_v3ColorOBB ? m_v3ColorAABB : a_v3Color; }
+//void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color == m_v3ColorOBB ? m_v3ColorAABB : a_v3Color; }
+void BoundingBoxClass::SetColorAABB(vector3 a_v3Color) { m_v3ColorAABB = a_v3Color; }
 
 matrix4 BoundingBoxClass::GetModelMatrixOBB(void) { return m_m4ModelToWorldOBB; }
 void BoundingBoxClass::SetModelMatrixOBB(matrix4 a_m4Matrix)

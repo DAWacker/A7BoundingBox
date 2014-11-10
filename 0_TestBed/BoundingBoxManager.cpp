@@ -176,8 +176,8 @@ void BoundingBoxManager::Update(void)
 		m_vBoundingBox[nBox]->SetColorOBB(MEWHITE);
 		m_vBoundingBox[nBox]->SetColorAABB(MEWHITE);
 	}
-	//CollisionCheck();
-	//CollisionResponse();
+	CollisionCheck();
+	CollisionResponse();
 }
 
 void BoundingBoxManager::CollisionCheck(void)
@@ -186,18 +186,44 @@ void BoundingBoxManager::CollisionCheck(void)
 	//AABB
 	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
 	{
+		vector3 currentCentroid = m_vBoundingBox[nBox2]->GetCentroidAABB();
 		vector3 currentMax = m_vBoundingBox[nBox2]->GetMaxAABB();
 		vector3 currentMin = m_vBoundingBox[nBox2]->GetMinAABB();
 		for(int nBox1 = 0; nBox1 < m_nBoxes; nBox1++)
 		{
-			vector3 checkingMax = m_vBoundingBox[nBox1]->GetMaxAABB();
-			vector3 checkingMin = m_vBoundingBox[nBox1]->GetMinAABB();
 			if(nBox1 != nBox2)
 			{
-				if(checkingMin.x > currentMin.x || checkingMax.x < currentMax.x){
-					if(checkingMin.y > currentMin.y || checkingMax.y < checkingMin.y){
-						if(checkingMin.z > currentMin.z || checkingMax.z < checkingMax.z)
-							m_vCollidingNamesAABB.push_back(m_vBoundingBox[m_nBoxes]->GetInstanceName());
+				vector3 checkingCentroid = m_vBoundingBox[nBox1]->GetCentroidAABB();
+				vector3 checkingMax = m_vBoundingBox[nBox1]->GetMaxAABB();
+				vector3 checkingMin = m_vBoundingBox[nBox1]->GetMinAABB();
+
+				// Is the box we are checking against to the left or right of the current one
+				if (currentCentroid.x > checkingCentroid.x)
+				{
+					if (checkingMax.x > currentMin.x)
+					{
+						if (checkingMax.y > currentMin.y)
+						{
+							if (checkingMax.z > currentMin.z)
+							{
+								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
+								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
+							}
+						}
+					}
+				}
+				else
+				{
+					if (currentMax.x > checkingMin.x)
+					{
+						if (currentMax.y > checkingMin.y)
+						{
+							if (currentMax.z > checkingMin.z)
+							{
+								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
+								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
+							}
+						}
 					}
 				}
 			}

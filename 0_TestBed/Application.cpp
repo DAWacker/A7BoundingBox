@@ -2,7 +2,7 @@
 void ApplicationClass::Update (void)
 {
 	m_pSystem->UpdateTime(); //Update the system
-	//printf("FPS: %d \r", m_pSystem->FPS);//print the Frames per Second
+	printf("FPS: %d \r", m_pSystem->FPS);//print the Frames per Second
 
 	//Check if the objects models have been read
 	static bool bObjectSelected = false;

@@ -180,9 +180,34 @@ void BoundingBoxManager::Update(void)
 	CollisionResponse();
 }
 
+//Helper function for making local coordinates global
+vector3 LocalToWorld(vector3 vec3, matrix4 mat4World){
+	vector4 vec4(vec3.x, vec3.y, vec3.z, 1);
+	vector4 vec4Translated = mat4World * vec4;
+	vector3 translated(vec4Translated.x, vec4Translated.y, vec4Translated.z);
+	return translated;
+}
+
 void BoundingBoxManager::CollisionCheck(void)
 {
-	//OBB
+	//OBB-Not finished
+	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
+	{
+		BoundingBoxClass * current = m_vBoundingBox[nBox2];
+		vector3 currentCentroid = LocalToWorld(current->GetCentroidOBB, current->GetModelMatrixOBB());
+		vector3 currentMax = LocalToWorld(current->GetMaxOBB(), current->GetModelMatrixOBB());
+		vector3 currentMin = LocalToWorld(current->GetMinOBB(), current->GetModelMatrixOBB());
+		for(int nBox1 = 0; nBox1 < m_nBoxes; nBox1++)
+		{
+			if(nBox1 != nBox2)
+			{
+				BoundingBoxClass * checking = m_vBoundingBox[nBox1];
+				vector3 checkingCentroid = LocalToWorld(checking->GetCentroidOBB, checking->GetModelMatrixOBB());
+				vector3 checkingMax = LocalToWorld(checking->GetMaxOBB(), checking->GetModelMatrixOBB());
+				vector3 checkingMin = LocalToWorld(checking->GetMinOBB(), checking->GetModelMatrixOBB());
+			}
+		}
+	}
 	//AABB
 	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
 	{

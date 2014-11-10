@@ -186,43 +186,26 @@ void BoundingBoxManager::CollisionCheck(void)
 	//AABB
 	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
 	{
-		vector3 currentCentroid = m_vBoundingBox[nBox2]->GetCentroidAABB();
 		vector3 currentMax = m_vBoundingBox[nBox2]->GetMaxAABB();
 		vector3 currentMin = m_vBoundingBox[nBox2]->GetMinAABB();
 		for(int nBox1 = 0; nBox1 < m_nBoxes; nBox1++)
 		{
 			if(nBox1 != nBox2)
 			{
-				vector3 checkingCentroid = m_vBoundingBox[nBox1]->GetCentroidAABB();
 				vector3 checkingMax = m_vBoundingBox[nBox1]->GetMaxAABB();
 				vector3 checkingMin = m_vBoundingBox[nBox1]->GetMinAABB();
 
-				// Is the box we are checking against to the left or right of the current one
-				if (currentCentroid.x > checkingCentroid.x)
+				if ((currentMax.x > checkingMin.x && currentMax.x < checkingMax.x) ||
+					(checkingMax.x > currentMin.x && checkingMin.x < currentMax.x))
 				{
-					if (checkingMax.x > currentMin.x)
+					if ((currentMax.y > checkingMin.y && currentMax.y < checkingMax.y) ||
+						(checkingMax.y > currentMin.y && checkingMin.y < currentMax.y))
 					{
-						if (checkingMax.y > currentMin.y)
+						if ((currentMax.z > checkingMin.z && currentMax.z < checkingMax.z) ||
+							(checkingMax.z > currentMin.z && checkingMin.z < currentMax.z))
 						{
-							if (checkingMax.z > currentMin.z)
-							{
-								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
-								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
-							}
-						}
-					}
-				}
-				else
-				{
-					if (currentMax.x > checkingMin.x)
-					{
-						if (currentMax.y > checkingMin.y)
-						{
-							if (currentMax.z > checkingMin.z)
-							{
-								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
-								m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
-							}
+							m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox1]->GetInstanceName());
+							m_vCollidingNamesAABB.push_back(m_vBoundingBox[nBox2]->GetInstanceName());
 						}
 					}
 				}

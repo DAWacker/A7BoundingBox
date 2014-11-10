@@ -173,7 +173,7 @@ void BoundingBoxManager::Update(void)
 	m_vCollidingNamesAABB.clear();
 	for(int nBox = 0; nBox < m_nBoxes; nBox++)
 	{
-		m_vBoundingBox[nBox]->SetColorOBB(MEWHITE);
+		m_vBoundingBox[nBox]->SetColorOBB(MEBLUE);
 		m_vBoundingBox[nBox]->SetColorAABB(MEWHITE);
 	}
 	CollisionCheck();
@@ -182,7 +182,7 @@ void BoundingBoxManager::Update(void)
 
 void BoundingBoxManager::CollisionCheck(void)
 {
-	//OBB-David
+	//OBB
 	//AABB
 	for(int nBox2 = 0; nBox2 < m_nBoxes; nBox2++)
 	{
@@ -239,7 +239,7 @@ void BoundingBoxManager::CollisionResponse(void)
 	for(int nBox = 0; nBox < m_nBoxes; nBox++)
 	{
 		if(CheckForNameInList(m_vBoundingBox[nBox]->GetInstanceName(), 0))
-			m_vBoundingBox[nBox]->SetColorOBB(MERED);
+			m_vBoundingBox[nBox]->SetColorOBB(MEYELLOW);
 		if(CheckForNameInList(m_vBoundingBox[nBox]->GetInstanceName(), 1))
 			m_vBoundingBox[nBox]->SetColorAABB(MERED);
 	}

@@ -150,7 +150,7 @@ void BoundingBoxClass::SetModelMatrixAABB(matrix4 a_m4Matrix)
 
 	CalculateAABB(m_sInstance);
 
-	matrix4 translate = glm::translate(a_m4Matrix, m_v3CentroidAABB);
+	matrix4 translate = glm::translate(m_v3CentroidAABB);
 
 	vector3 v3Min = GetMinAABB();
 	vector3 v3Max = GetMaxAABB();
